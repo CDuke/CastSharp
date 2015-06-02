@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CastSharp", "CastSharp\CastSharp.csproj", "{A59DE34E-EFA1-42EC-B1F2-D2060BE8E3D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CastSharp.Tests", "CastSharp.Tests\CastSharp.Tests.csproj", "{0A80699C-2FE8-4239-909D-D0D07499D0D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{A59DE34E-EFA1-42EC-B1F2-D2060BE8E3D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A59DE34E-EFA1-42EC-B1F2-D2060BE8E3D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A59DE34E-EFA1-42EC-B1F2-D2060BE8E3D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A80699C-2FE8-4239-909D-D0D07499D0D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A80699C-2FE8-4239-909D-D0D07499D0D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A80699C-2FE8-4239-909D-D0D07499D0D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A80699C-2FE8-4239-909D-D0D07499D0D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

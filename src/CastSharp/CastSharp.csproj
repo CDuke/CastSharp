@@ -40,8 +40,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chromecast.cs" />
+    <Compile Include="Mdns\DnsMessageReader.cs" />
+    <Compile Include="Mdns\DnsMessageWriter.cs" />
+    <Compile Include="Mdns\Name.cs" />
+    <Compile Include="Mdns\RecordClass.cs" />
+    <Compile Include="Mdns\RecordSection.cs" />
+    <Compile Include="Mdns\RecordType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SocketAwaitable\SocketAwaitable.cs" />
+    <Compile Include="SocketAwaitable\SocketAwaiter.cs" />
+    <Compile Include="SocketAwaitable\SocketExtensions.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
