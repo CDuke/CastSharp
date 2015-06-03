@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Security.Policy;
 using System.Threading.Tasks;
 using CastSharp.Mdns;
-using CastSharp.SocketAwaitable;
 
 namespace CastSharp
 {
     public class Chromecast
     {
-        private static readonly IPEndPoint _multicastEndpoint = new IPEndPoint(IPAddress.Parse("224.0.0.251"), 5353);
-        private static readonly Random _randomGenerator = new Random();
 
         public static async Task<List<Chromecast>> GetDevices()
         {
@@ -25,36 +22,15 @@ namespace CastSharp
                     && networkInterface.SupportsMulticast
                     && networkInterface.OperationalStatus == OperationalStatus.Up)
                 {
-                    var ipProperties = networkInterface.GetIPProperties();
-
-                    //var udpClient = new UdpClient();
-                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                    var index = ipProperties.GetIPv4Properties().Index;
-                    socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, IPAddress.HostToNetworkOrder(index));
-                    var ip = _multicastEndpoint.Address;
-                    socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, index));
-                    socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 255);
-                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 2000);
-                    socket.Bind(new IPEndPoint(IPAddress.Any, _multicastEndpoint.Port));
-
-                    var lastQueryId = (ushort)_randomGenerator.Next(0, ushort.MaxValue);
-                    var writer = new DnsMessageWriter();
-                    writer.WriteQueryHeader(lastQueryId);
-                    writer.WriteQuestion(new Name("_googlecast._tcp.local"), RecordType.PTR);
-
-                    var packet = writer.Packets[0];
+                    var mullticastClient = new MulticastClient(networkInterface, "_googlecast._tcp.local");
                     var awaitable = new SocketAwaitable.SocketAwaitable();
-                    awaitable.Buffer = packet;
-                    awaitable.Arguments.RemoteEndPoint = _multicastEndpoint;
-                    await socket.SendToAsync(awaitable);
-
-
+                    await mullticastClient.SendAsync(awaitable);
+                    awaitable.Buffer = new ArraySegment<byte>(new byte[9000]);
                     while (true)
                     {
-                        var result = await socket.ReceiveAsync(awaitable);
+                        var result = await mullticastClient.ReceiveAsync(awaitable);
 
-                        var stream = new MemoryStream(awaitable.Transferred.Array, 0, awaitable.Transferred.Array.Length);
+                        var stream = new MemoryStream(awaitable.Transferred.Array, awaitable.Transferred.Offset, awaitable.Transferred.Count);
                         var reader = new DnsMessageReader(stream);
                         var header = reader.ReadHeader();
                         if (header.IsResponse && header.IsNoError && header.IsAuthorativeAnswer)
@@ -75,7 +51,7 @@ namespace CastSharp
                                         {
                                             continue;
                                         }
-                                        address.ScopeId = ipProperties.GetIPv6Properties().Index;
+                                        //address.ScopeId = ipProperties.GetIPv6Properties().Index;
                                     }
                                     //OnARecord(recordHeader.Name, address, recordHeader.Ttl);
                                 }
@@ -89,6 +65,7 @@ namespace CastSharp
                                     {
                                         serviceName = recordHeader.Name;
                                         instanceName = reader.ReadPtrRecord();
+                                        Debug.WriteLine("Receive from: " + serviceName);
                                     }
                                     else
                                     {

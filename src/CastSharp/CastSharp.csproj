@@ -42,6 +42,7 @@
     <Compile Include="Chromecast.cs" />
     <Compile Include="Mdns\DnsMessageReader.cs" />
     <Compile Include="Mdns\DnsMessageWriter.cs" />
+    <Compile Include="Mdns\MulticastClient.cs" />
     <Compile Include="Mdns\Name.cs" />
     <Compile Include="Mdns\RecordClass.cs" />
     <Compile Include="Mdns\RecordSection.cs" />

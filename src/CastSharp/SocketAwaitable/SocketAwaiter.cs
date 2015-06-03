@@ -118,9 +118,9 @@ namespace CastSharp.SocketAwaitable
         /// <returns>
         ///     A <see cref="SocketError" /> that represents the result of the socket operations.
         /// </returns>
-        public SocketError GetResult()
+        public SocketAsyncEventArgs GetResult()
         {
-            return this.awaitable.Arguments.SocketError;
+            return this.awaitable.Arguments;
         }
 
         /// <summary>
