@@ -22,21 +22,23 @@ namespace CastSharp
                     && networkInterface.SupportsMulticast
                     && networkInterface.OperationalStatus == OperationalStatus.Up)
                 {
-                    var mullticastClient = new MulticastClient(networkInterface, chromecastPtr);
-                    var awaitable = new SocketAwaitable.SocketAwaitable();
-                    await mullticastClient.SendAsync(awaitable);
-                    awaitable.Buffer = new ArraySegment<byte>(new byte[9000]);
-                    while (true)
+                    using (var mullticastClient = new MulticastClient(networkInterface, chromecastPtr))
                     {
-                        await mullticastClient.ReceiveAsync(awaitable);
+                        var awaitable = new SocketAwaitable.SocketAwaitable();
+                        await mullticastClient.SendAsync(awaitable);
+                        awaitable.Buffer = new ArraySegment<byte>(new byte[9000]);
+                        while (true)
+                        {
+                            await mullticastClient.ReceiveAsync(awaitable);
 
-                        var stream = new MemoryStream(awaitable.Transferred.Array, awaitable.Transferred.Offset, awaitable.Transferred.Count);
-                        var reader = new DnsMessageReader(stream);
-                        chromecastDeviceInfo = TryReadChromecastDeviceInfo(reader);
-                        if (chromecastDeviceInfo != null)
-                            break;
+                            var stream = new MemoryStream(awaitable.Transferred.Array, awaitable.Transferred.Offset,
+                                awaitable.Transferred.Count);
+                            var reader = new DnsMessageReader(stream);
+                            chromecastDeviceInfo = TryReadChromecastDeviceInfo(reader);
+                            if (chromecastDeviceInfo != null)
+                                break;
+                        }
                     }
-                    mullticastClient.Close();
                 }
 
                 if (chromecastDeviceInfo != null)

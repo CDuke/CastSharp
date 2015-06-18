@@ -6,7 +6,7 @@ using CastSharp.SocketAwaitable;
 
 namespace CastSharp.Mdns
 {
-    internal sealed class MulticastClient
+    internal sealed class MulticastClient : IDisposable
     {
         private readonly string _ptr;
         private static readonly IPEndPoint _multicastEndpoint = new IPEndPoint(IPAddress.Parse("224.0.0.251"), 5353);
@@ -55,6 +55,11 @@ namespace CastSharp.Mdns
         public void Close()
         {
             _socket.Close();
+        }
+
+        public void Dispose()
+        {
+            _socket.Dispose();
         }
     }
 }
