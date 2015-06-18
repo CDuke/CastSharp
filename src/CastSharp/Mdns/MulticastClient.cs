@@ -51,5 +51,10 @@ namespace CastSharp.Mdns
         {
             return _socket.ReceiveAsync(awaitable);
         }
+
+        public void Close()
+        {
+            _socket.Close();
+        }
     }
 }

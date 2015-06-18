@@ -14,6 +14,7 @@ namespace CastSharp
 
         public async Task<ChromecastDeviceInfo> GetDevice()
         {
+            ChromecastDeviceInfo chromecastDeviceInfo = null;
             foreach (var networkInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if ((networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
@@ -27,18 +28,24 @@ namespace CastSharp
                     awaitable.Buffer = new ArraySegment<byte>(new byte[9000]);
                     while (true)
                     {
-                        var result = await mullticastClient.ReceiveAsync(awaitable);
+                        await mullticastClient.ReceiveAsync(awaitable);
 
                         var stream = new MemoryStream(awaitable.Transferred.Array, awaitable.Transferred.Offset, awaitable.Transferred.Count);
                         var reader = new DnsMessageReader(stream);
-                        var chromecastDeviceInfo = TryReadChromecastDeviceInfo(reader);
+                        chromecastDeviceInfo = TryReadChromecastDeviceInfo(reader);
                         if (chromecastDeviceInfo != null)
-                            return chromecastDeviceInfo;
+                            break;
                     }
+                    mullticastClient.Close();
+                }
+
+                if (chromecastDeviceInfo != null)
+                {
+                    break;
                 }
             }
 
-            return null;
+            return chromecastDeviceInfo;
         }
 
         private static ChromecastDeviceInfo TryReadChromecastDeviceInfo(DnsMessageReader reader)
