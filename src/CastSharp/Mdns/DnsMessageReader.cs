@@ -105,11 +105,11 @@ namespace CastSharp.Mdns
                 SkipRecordBytes();
             }
 
-            Name name = ReadName();
-            ushort type = ReadUInt16();
-            ushort _class = ReadUInt16();
-            uint ttl = ReadUInt32();
-            ushort rdLength = ReadUInt16();
+            var name = ReadName();
+            var type = ReadUInt16();
+            var _class = ReadUInt16();
+            var ttl = ReadUInt32();
+            var rdLength = ReadUInt16();
             _recordLength = rdLength;
             _nextRecord = (int)(BaseStream.Position + rdLength);
 

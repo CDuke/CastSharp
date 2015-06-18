@@ -40,6 +40,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chromecast.cs" />
+    <Compile Include="ChromecastDeviceInfo.cs" />
+    <Compile Include="ChromecastDiscovery.cs" />
     <Compile Include="Mdns\DnsMessageReader.cs" />
     <Compile Include="Mdns\DnsMessageWriter.cs" />
     <Compile Include="Mdns\MulticastClient.cs" />

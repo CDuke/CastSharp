@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CastSharp.Mdns
 {
-    class Name : IComparable<Name>
+    internal class Name : IComparable<Name>
     {
         public Name(string name)
         {

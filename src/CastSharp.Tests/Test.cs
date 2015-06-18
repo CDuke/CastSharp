@@ -8,7 +8,7 @@ namespace CastSharp.Tests
         [Fact]
         public async Task FactMethodName()
         {
-            var a = await Chromecast.GetDevices();
+            var a = await Chromecast.GetDevice();
         }
     }
 }
