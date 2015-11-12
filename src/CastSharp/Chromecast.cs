@@ -21,8 +21,6 @@ namespace CastSharp
             return new Chromecast(chromecastDeviceInfo);
         }
 
-
-
         public async Task Connect()
         {
             throw new NotImplementedException();

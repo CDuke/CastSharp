@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using CastSharp.SocketAwaitable;
+using System.Threading.Tasks;
 
 namespace CastSharp.Mdns
 {
@@ -32,7 +32,7 @@ namespace CastSharp.Mdns
             _socketReceiveAwaitable.Buffer = new ArraySegment<byte>(new byte[9000]);
         }
 
-        public SocketAwaitable.SocketAwaitable SendAsync(SocketAwaitable.SocketAwaitable awaitable)
+        public Task<int> SendAsync()
         {
             var lastQueryId = (ushort)_randomGenerator.Next(0, ushort.MaxValue);
             var writer = new DnsMessageWriter();
@@ -41,15 +41,21 @@ namespace CastSharp.Mdns
 
             var packet = writer.Packets[0];
 
-            awaitable.Buffer = packet;
-            awaitable.Arguments.RemoteEndPoint = _multicastEndpoint;
-            _socketReceiveAwaitable.RemoteEndPoint = _multicastEndpoint;
-            return _socket.SendToAsync(awaitable);
+            var udpClient = new UdpClient
+            {
+                Client = _socket
+            };
+            return udpClient.SendAsync(packet.Array, packet.Count, _multicastEndpoint);
         }
 
-        public SocketAwaitable.SocketAwaitable ReceiveAsync(SocketAwaitable.SocketAwaitable awaitable)
+        public async Task<byte[]> ReceiveAsync()
         {
-            return _socket.ReceiveAsync(awaitable);
+            var udpClient = new UdpClient
+            {
+                Client = _socket
+            };
+            var res = await udpClient.ReceiveAsync();
+            return res.Buffer;
         }
 
         public void Close()

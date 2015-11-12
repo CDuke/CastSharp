@@ -24,15 +24,12 @@ namespace CastSharp
                 {
                     using (var mullticastClient = new MulticastClient(networkInterface, chromecastPtr))
                     {
-                        var awaitable = new SocketAwaitable.SocketAwaitable();
-                        await mullticastClient.SendAsync(awaitable);
-                        awaitable.Buffer = new ArraySegment<byte>(new byte[9000]);
+                        await mullticastClient.SendAsync();
                         while (true)
                         {
-                            await mullticastClient.ReceiveAsync(awaitable);
+                            var response = await mullticastClient.ReceiveAsync();
 
-                            var stream = new MemoryStream(awaitable.Transferred.Array, awaitable.Transferred.Offset,
-                                awaitable.Transferred.Count);
+                            var stream = new MemoryStream(response, 0, response.Length);
                             var reader = new DnsMessageReader(stream);
                             chromecastDeviceInfo = TryReadChromecastDeviceInfo(reader);
                             if (chromecastDeviceInfo != null)
@@ -58,7 +55,6 @@ namespace CastSharp
             if (header.IsResponse && header.IsNoError && header.IsAuthorativeAnswer)
             {
                 chromecastDeviceInfo = new ChromecastDeviceInfo();
-                var isChromecastDevice = false;
                 for (var i = 0; i < header.QuestionCount; i++)
                 {
                     reader.ReadQuestion();
@@ -97,14 +93,17 @@ namespace CastSharp
 
                     if (!IsChromecastDevice(serviceName))
                     {
-                        chromecastDeviceInfo = null;
                         break;
                     }
                 }
 
-                if (chromecastDeviceInfo != null)
+                if (chromecastDeviceInfo.Name != null)
                 {
                     chromecastDeviceInfo.EndPoint = new IPEndPoint(ipAddress, port);
+                }
+                else
+                {
+                    chromecastDeviceInfo = null;
                 }
             }
 
