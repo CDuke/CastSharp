@@ -12,7 +12,6 @@ namespace CastSharp.Mdns
         private static readonly IPEndPoint _multicastEndpoint = new IPEndPoint(IPAddress.Parse("224.0.0.251"), 5353);
         private static readonly Random _randomGenerator = new Random();
         private readonly Socket _socket;
-        private readonly SocketAwaitable.SocketAwaitable _socketReceiveAwaitable = new SocketAwaitable.SocketAwaitable();
 
         public MulticastClient(NetworkInterface networkInterface, string ptr)
         {
@@ -28,8 +27,6 @@ namespace CastSharp.Mdns
             _socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption(ip, index));
             _socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 100);
             _socket.Bind(new IPEndPoint(IPAddress.Any, _multicastEndpoint.Port));
-
-            _socketReceiveAwaitable.Buffer = new ArraySegment<byte>(new byte[9000]);
         }
 
         public Task<int> SendAsync()
@@ -52,7 +49,7 @@ namespace CastSharp.Mdns
         {
             var udpClient = new UdpClient
             {
-                Client = _socket
+                Client = _socket,
             };
             var res = await udpClient.ReceiveAsync();
             return res.Buffer;

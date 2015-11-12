@@ -31,8 +31,7 @@ namespace CastSharp
 
                             var stream = new MemoryStream(response, 0, response.Length);
                             var reader = new DnsMessageReader(stream);
-                            chromecastDeviceInfo = TryReadChromecastDeviceInfo(reader);
-                            if (chromecastDeviceInfo != null)
+                            if (TryReadChromecastDeviceInfo(reader, out chromecastDeviceInfo))
                                 break;
                         }
                     }
@@ -47,9 +46,9 @@ namespace CastSharp
             return chromecastDeviceInfo;
         }
 
-        private static ChromecastDeviceInfo TryReadChromecastDeviceInfo(DnsMessageReader reader)
+        private static bool TryReadChromecastDeviceInfo(DnsMessageReader reader, out ChromecastDeviceInfo chromecastDeviceInfo)
         {
-            ChromecastDeviceInfo chromecastDeviceInfo = null;
+            chromecastDeviceInfo = null;
 
             var header = reader.ReadHeader();
             if (header.IsResponse && header.IsNoError && header.IsAuthorativeAnswer)
@@ -107,7 +106,7 @@ namespace CastSharp
                 }
             }
 
-            return chromecastDeviceInfo;
+            return chromecastDeviceInfo != null;
         }
 
         private static void ParseTxtRecord(List<string> txtRecord,
